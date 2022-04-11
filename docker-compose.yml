@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  users-db:
+    image: postgres
+    container_name: users-db
+    restart: always
+    tty: true
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PWD
+      - POSTGRES_DB=$DB_NAME
+    ports:
+      - "5432:5432"
+    networks:
+      - users
+
+  users-api:
+    build: ./
+    container_name: users-api
+    tty: true
+    environment:
+      - PORT=$PORT
+      - DB_USER=$DB_USER
+      - DB_PWD=$DB_PWD
+      - DB_NAME=$DB_NAME
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_DIALECT=$DB_DIALECT
+    ports:
+      - "3000:3000"
+    networks:
+      - users
+    depends_on:
+      - users-db
+    command: ./wait-for-it.sh users-db:5432 -t 10 -- npm run production
+
+networks:
+  users:
+    driver: bridge

@@ -8,7 +8,6 @@ class UserRepository {
   }
 
   async findAll (skip, limit) {
-    console.log(limit)
     return await userSchema.findAll({
       attributes: ['id', 'name', 'email'],
       limit: limit,
